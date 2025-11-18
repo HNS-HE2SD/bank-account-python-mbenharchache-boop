@@ -125,25 +125,4 @@ class Account:
 
 
 
-        # TEST CODE
-client1 = Client("A12345", "Malak", "Ben", "0661002233")
-
-acc1 = Account(client1)
-acc2 = Account(client1)
-
-acc1.credit(500)
-acc1.debit(200)
-acc1.debit(50, acc2)
-
-acc2.credit(300)
-acc2.debit(100)
-
-acc1.display()
-acc2.display()
-
-acc1.displayTransactions()
-acc2.displayTransactions()
-
-client1.displayAccounts()
-
-Account.displayNbAccounts()
+        
