@@ -1,0 +1,149 @@
+
+#CLASS CLIENT
+
+class Client:
+    def __init__(self, cin, firstName, lastName, tel=""):
+        self.__CIN = cin
+        self.__firstName = firstName
+        self.__lastName = lastName
+        self.__tel = tel
+
+        #every customer can have multiple accounts
+        self.accounts = []
+
+    #getters
+    def get_CIN(self): return self.__CIN
+    def get_firstName(self): return self.__firstName
+    def get_lastName(self): return self.__lastName
+    def get_tel(self): return self.__tel
+
+    #setter
+    def set_tel(self, tel): 
+        self.__tel = tel
+
+    #view customer information
+    def display(self):
+        print(f"CIN: {self.__CIN}, Name: {self.__firstName} {self.__lastName}, Tel: {self.__tel}")
+
+    #view all customer accounts
+    def displayAccounts(self):
+        print(f"\nAccounts of {self.__firstName} {self.__lastName}:")
+        if not self.accounts:
+            print("This client has no accounts.")
+        else:
+            for acc in self.accounts:
+                print(f"  -> Account {acc.get_code()} : {acc.get_balance()} DA")
+
+
+
+#CLASS ACCOUNT
+
+class Account:
+    __nbAccounts = 0  
+
+    def __init__(self, owner):
+        Account.__nbAccounts += 1
+        self.__code = Account.__nbAccounts
+        self.__balance = 0.0
+        self.__owner = owner
+
+        #a list that records all transactions
+        self.__transactions = []
+
+        #link account to customer
+        owner.accounts.append(self)
+
+    #getters
+    def get_code(self): return self.__code
+    def get_balance(self): return self.__balance
+    def get_owner(self): return self.__owner
+
+
+    #CREDIT METHOD
+
+    def credit(self, amount, account=None):
+        if amount <= 0:
+            print("Error: Amount must be positive.")
+            return
+
+        if account is None:
+            #regular deposit
+            self.__balance += amount
+            self.__transactions.append(f"Credited +{amount} DA")
+        else:
+            #transfer: This account receives funds
+            self.__balance += amount
+            self.__transactions.append(
+                f"Received +{amount} DA from account {account.get_code()}"
+            )
+
+            #the other account withdraws funds
+            account.debit(amount)
+
+    
+    #  DEBIT METHOD
+    def debit(self, amount, account=None):
+        if amount <= 0:
+            print("Error: Amount must be positive.")
+            return
+
+        if self.__balance < amount:
+            print("Error: Insufficient balance!")
+            return
+
+        #regular withdrawal
+        self.__balance -= amount
+        if account is None:
+            self.__transactions.append(f"Debited -{amount} DA")
+        else:
+            #transfer
+            self.__transactions.append(
+                f"Transferred -{amount} DA to account {account.get_code()}"
+            )
+            account.credit(amount)
+
+    #view account
+    def display(self):
+        print("\n====================")
+        print(f"Account Code : {self.__code}")
+        print(f"Owner        : {self.__owner.get_firstName()} {self.__owner.get_lastName()}")
+        print(f"Balance      : {self.__balance} DA")
+        print("====================")
+
+    #view transaction history
+    def displayTransactions(self):
+        print(f"\nTransaction history of account {self.__code}:")
+        if not self.__transactions:
+            print("No transactions.")
+        else:
+            for t in self.__transactions:
+                print(" -", t)
+
+    @staticmethod
+    def displayNbAccounts():
+        print("Total accounts created:", Account.__nbAccounts)
+
+
+
+        # TEST CODE
+client1 = Client("A12345", "Malak", "Ben", "0661002233")
+
+acc1 = Account(client1)
+acc2 = Account(client1)
+
+acc1.credit(500)
+acc1.debit(200)
+acc1.debit(50, acc2)
+
+acc2.credit(300)
+acc2.debit(100)
+
+acc1.display()
+acc2.display()
+
+acc1.displayTransactions()
+acc2.displayTransactions()
+
+client1.displayAccounts()
+
+Account.displayNbAccounts()
